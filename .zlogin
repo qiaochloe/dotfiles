@@ -1,0 +1,1 @@
+/Users/qiaochloe/.zprezto/runcoms/zlogin

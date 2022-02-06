@@ -23,3 +23,5 @@ export NVM_DIR="$HOME/.nvm"
 # For managing dotfiles on GitHub
 alias config='/usr/bin/git --git-dir=/Users/qiaochloe/.cfg/ --work-tree=/Users/qiaochloe'
 
+# For The Fuck
+eval $(thefuck --alias)

@@ -40,3 +40,6 @@ eval $(thefuck --alias)
 # ALIASES
 alias config='/usr/bin/git --git-dir=/Users/qiaochloe/.cfg/ --work-tree=/Users/qiaochloe' # DOTFILES (.cfg repo)
 alias path='echo $PATH | tr -s ":" "\n"' # PRETTY PRINT THE PATH
+
+# ZSH-SYNTAX-HIGHLIGHTING (keep at the bottom)
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

@@ -1,6 +1,18 @@
-# HOMEBREW
+# POWERLEVEL10K (should stay close to the top)
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+# PATH
 export PATH=~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+
+# HOMEBREW
 export PATH="/opt/homebrew/bin:$PATH"
+
+# POWERLEVEL10K
+source $(brew --prefix)/opt/powerlevel10k/powerlevel10k.zsh-theme
 
 # CONDA
 __conda_setup="$('/opt/homebrew/Caskroom/miniforge/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"

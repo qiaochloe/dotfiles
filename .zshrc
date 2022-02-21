@@ -44,3 +44,6 @@ alias path='echo $PATH | tr -s ":" "\n"' # PRETTY PRINT THE PATH
 
 # ZSH-SYNTAX-HIGHLIGHTING (keep at the bottom)
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# ZOXIDE
+eval "$(zoxide init --cmd cd --hook prompt zsh)"

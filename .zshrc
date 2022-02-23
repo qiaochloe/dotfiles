@@ -5,11 +5,23 @@ fi
 
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
+# PATH
+export PATH=~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+
+# HOMEBREW
+export PATH="/opt/homebrew/bin:$PATH"
+
 source $(brew --prefix)/opt/powerlevel10k/powerlevel10k.zsh-theme
 
 # ALIASES
 alias config='/usr/bin/git --git-dir=/Users/qiaochloe/.cfg/ --work-tree=/Users/qiaochloe' # DOTFILES (.cfg repo)
 alias path='echo $PATH | tr -s ":" "\n"' # PRETTY PRINT THE PATH
+
+# THE FUCK
+eval $(thefuck --alias)
+
+# ZOXIDE
+eval "$(zoxide init --cmd cd --hook prompt zsh)"
 
 # CONDA
 __conda_setup="$('/opt/homebrew/Caskroom/miniforge/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
@@ -24,9 +36,6 @@ else
 fi
 unset __conda_setup
 
-# HOMEBREW
-export PATH="/opt/homebrew/bin:$PATH"
-
 # FZF
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
@@ -34,15 +43,6 @@ export PATH="/opt/homebrew/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-# PATH
-export PATH=~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
-
-# THE FUCK
-eval $(thefuck --alias)
-
-# ZOXIDE
-eval "$(zoxide init --cmd cd --hook prompt zsh)"
 
 # ZSH-SYNTAX-HIGHLIGHTING (keep at the bottom)
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

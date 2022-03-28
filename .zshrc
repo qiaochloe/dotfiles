@@ -46,3 +46,6 @@ export NVM_DIR="$HOME/.nvm"
 
 # ZSH-SYNTAX-HIGHLIGHTING (keep at the bottom)
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# RUBY
+eval "$(rbenv init - zsh)"

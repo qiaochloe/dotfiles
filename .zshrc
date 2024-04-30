@@ -11,7 +11,7 @@ export PATH=~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 # HOMEBREW
 export PATH="/opt/homebrew/bin:$PATH"
 
-source $(brew --prefix)/opt/powerlevel10k/powerlevel10k.zsh-theme
+source $(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme
 
 # ALIASES
 alias config='/usr/bin/git --git-dir=/Users/qiaochloe/.cfg/ --work-tree=/Users/qiaochloe' # DOTFILES (.cfg repo)
@@ -29,9 +29,9 @@ if [ $? -eq 0 ]; then
     eval "$__conda_setup"
 else
     if [ -f "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh" ]; then
-        . "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh"
+# . "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh"  # commented out by conda initialize
     else
-        export PATH="/opt/homebrew/Caskroom/miniforge/base/bin:$PATH"
+# export PATH="/opt/homebrew/Caskroom/miniforge/base/bin:$PATH"  # commented out by conda initialize
     fi
 fi
 unset __conda_setup
@@ -50,3 +50,21 @@ source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 # RUBY
 export PATH="$HOME/.rbenv/shims:$PATH"
 eval "$(rbenv init - zsh)"
+
+# RUST
+export PATH="$HOME/.cargo/bin:$PATH"
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/opt/homebrew/Caskroom/miniforge/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh" ]; then
+        . "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh"
+    else
+        export PATH="/opt/homebrew/Caskroom/miniforge/base/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+

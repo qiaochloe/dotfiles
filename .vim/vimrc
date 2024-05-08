@@ -1,0 +1,50 @@
+" https://dougblack.io/words/a-good-vimrc.html
+set termguicolors " enable gui color 
+syntax enable " enable syntax processing
+colorscheme one-monokai " https://github.com/fratajczak/one-monokai-vim
+
+set tabstop=4 " number of visual spaces per TAB
+set softtabstop=4 " number of spaces in TAB when editing
+set expandtab " tabs are spaces
+
+set number " show line numbers
+set showcmd " show command in bottom bar
+
+" set cursorline " highlight current line
+" set wildmenu " visual autocomplete for command menu
+" set lazyredraw " redraw only when we need to
+
+" set showmatch " highlight matching [{()}]
+
+set incsearch " search as characters are entered
+set hlsearch " highlight matches 
+
+" move vertically by visual line rather than line break
+nnoremap j gj
+nnoremap k gk
+
+" move to beginning/end of line
+" cmd-h mapped to ^ in iTerm
+" cmd-l mapped to $ in iTerm
+
+" nnoremap gV `[v`] " highlight last inserted text
+
+let mapleader=","
+
+" change cursor modes for iTerm2
+" 1 -> bar
+" 2 -> underscore 
+" 0 -> block
+let &t_SI = "\<Esc>]50;CursorShape=1\x7" " INSERT mode
+let &t_SR = "\<Esc>]50;CursorShape=2\x7" " REPLACE mode
+let &t_EI = "\<Esc>]50;CursorShape=2\x7" " NORMAL mode (ELSE)
+
+" 4 -> solid underscore
+" 6 -> solid bar
+autocmd VimLeave * silent !echo -ne "\033[6 q"
+autocmd VimEnter * silent !echo -ne "\033[4 q"
+
+" remove lag for cursor
+set ttimeout
+set ttimeoutlen=1
+set ttyfast

@@ -1,36 +1,9 @@
 " https://dougblack.io/words/a-good-vimrc.html
+
+" set visuals
 set termguicolors " enable gui color 
 syntax enable " enable syntax processing
 colorscheme one-monokai " https://github.com/fratajczak/one-monokai-vim
-
-set tabstop=4 " number of visual spaces per TAB
-set softtabstop=4 " number of spaces in TAB when editing
-set expandtab " tabs are spaces
-
-set number " show line numbers
-set showcmd " show command in bottom bar
-
-" set cursorline " highlight current line
-" set wildmenu " visual autocomplete for command menu
-" set lazyredraw " redraw only when we need to
-
-" set showmatch " highlight matching [{()}]
-
-set incsearch " search as characters are entered
-set hlsearch " highlight matches 
-
-" move vertically by visual line rather than line break
-nnoremap j gj
-nnoremap k gk
-
-" move to beginning/end of line
-" cmd-h mapped to ^ in iTerm
-" cmd-l mapped to $ in iTerm
-
-" highlight last inserted text
-" nnoremap gV `[v`]
-
-let mapleader=","
 
 " change cursor modes for iTerm2
 " 1 -> bar
@@ -50,7 +23,37 @@ set ttimeout
 set ttimeoutlen=1
 set ttyfast
 
+set expandtab " tabs are spaces
+set number " show line numbers
+set relativenumber " show relative line numbers
+set smartindent
+" set tabstop=4 " number of visual spaces per TAB
+" set softtabstop=4 " number of spaces in TAB when editing
+" set showcmd " show command in bottom bar
+" set cursorline " highlight current line
+" set wildmenu " visual autocomplete for command menu
+" set lazyredraw " redraw only when we need to
+" set showmatch " highlight matching [{()}]
+
+set incsearch " search as characters are entered
+set hlsearch " highlight matches 
+
+" move vertically by visual line rather than line break
+nnoremap j gj
+nnoremap k gk
+
+" move to beginning/end of line
+" cmd-h mapped to ^ in iTerm
+" cmd-l mapped to $ in iTerm
+
+" highlight last inserted text
+" nnoremap gV `[v`]
+
+let mapleader=","
+
 " mapped esc to caps lock
+set backspace=indent,eol,start " set backspace key
+set visualbell " remove the beeping
 
 call plug#begin()
 " vim-plug: https://github.com/junegunn/vim-plug
@@ -63,9 +66,10 @@ filetype plugin indent on " necessary for vimtex
 let g:tex_flavor='latex' 
 let g:vimtex_view_method = 'zathura' " viewer method
 let g:vimtex_compiler_method = 'latexmk' " default compiler backend
-" set conceallevel=1 " makes latex code invisible when your cursor not on line 
-" let g:tex_conceal='abdmg' " configure concealment
-" hi! clear Conceal " manually specifies highlight group for conceal characters
+set conceallevel=1 " makes latex code invisible when your cursor not on line 
+let g:tex_conceal='abdmg' " configure concealment
+hi! clear Conceal " manually specifies highlight group for conceal characters
+
 Plug 'sirver/ultisnips'
 let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips/']
 let g:UltiSnipsExpandTrigger="<tab>"

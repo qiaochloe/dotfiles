@@ -29,7 +29,7 @@ set relativenumber " show relative line numbers
 set smartindent
 set tabstop=4 " number of visual spaces per TAB
 set softtabstop=4 " number of spaces in TAB when editing
-" set showcmd " show command in bottom bar
+set showcmd " show command in bottom bar
 " set cursorline " highlight current line
 " set wildmenu " visual autocomplete for command menu
 " set lazyredraw " redraw only when we need to
@@ -55,12 +55,12 @@ let mapleader=","
 set backspace=indent,eol,start " set backspace key
 set visualbell " remove the beeping
 
-call plug#begin()
+:set clipboard=unnamed " use system clipboard for y and p
+
 " vim-plug: https://github.com/junegunn/vim-plug
 " Default plugin directory is '~/.vim/plugged'
 " Run :PlugInstall to install plugins
-
-" vimtex configuration
+call plug#begin()
 Plug 'lervag/vimtex', { 'tag': 'v2.15' } 
 filetype plugin indent on " necessary for vimtex
 let g:tex_flavor='latex' 

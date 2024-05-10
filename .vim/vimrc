@@ -27,8 +27,8 @@ set expandtab " tabs are spaces
 set number " show line numbers
 set relativenumber " show relative line numbers
 set smartindent
-" set tabstop=4 " number of visual spaces per TAB
-" set softtabstop=4 " number of spaces in TAB when editing
+set tabstop=4 " number of visual spaces per TAB
+set softtabstop=4 " number of spaces in TAB when editing
 " set showcmd " show command in bottom bar
 " set cursorline " highlight current line
 " set wildmenu " visual autocomplete for command menu
@@ -72,8 +72,14 @@ hi! clear Conceal " manually specifies highlight group for conceal characters
 
 Plug 'sirver/ultisnips'
 let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips/']
-let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsExpandTrigger="<c-tab>"
 let g:UltiSnipsJumpForwardTrigger="<c-b>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
+Plug 'tmsvg/pear-tree'
+let g:pear_tree_smart_openers = 1
+let g:pear_tree_smart_closers = 1
+let g:pear_tree_smart_backspace = 1
+let g:pear_tree_repeatable_expand = 0
+imap <tab> <Plug>(PearTreeJump)
 call plug#end()

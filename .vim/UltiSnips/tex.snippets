@@ -1,3 +1,7 @@
+global !p
+def math():
+    return vim.eval('vimtex#syntax#in_mathzone()') == '1'
+endglobal
 
 snippet beg "begin{} / end{}" A
 \begin{$1}
@@ -7,7 +11,7 @@ endsnippet
 
 # math mode
 
-snippet imm "Math" wA
+snippet lmm "in-line math" A
 $${1}$`!p
 if t[2] and t[2][0] not in [',', '.', '?', '-', ' ']:
     snip.rv = ' '
@@ -16,7 +20,7 @@ else:
 `$2
 endsnippet
 
-snippet dmm "Math" wA
+snippet dmm "display math" A
 \[$1\] $0
 endsnippet
 
@@ -55,16 +59,61 @@ snip.rv = stripped[0:i] + "\\frac{" + stripped[i+1:-1] + "}"
 `{$1}$0
 endsnippet
 
+# Basic proof symbols
+
+context "math()"
+snippet to "To" iA
+\to
+endsnippet
+
+context "math()"
+snippet in "In" iA
+\in
+endsnippet
+
+context "math()"
+snippet fa "Forall" iA
+\forall
+endsnippet
+
+context "math()"
+snippet neg "neg" iA
+\neg
+endsnippet
+
 # https://castel.dev/post/lecture-notes-1/#latex-snippets
 
-# model logic scripts
+snippet txt "Text" iA
+\text{$1}$0
+endsnippet
 
-snippet ld "Diamond" A
+# model logic scripts
+context "math()"
+snippet ld "Diamond" iA
 \lozenge
 endsnippet
 
-snippet lb "Box" A
+context "math()"
+snippet lb "Box" iA
 \square
 endsnippet
 
+context "math()"
+snippet mbf "mathbf" iA
+\mathbf{$1}$0
+endsnippet
 
+context "math()"
+snippet vd "vdash" A
+\vdash
+endsnippet
+
+context "math()"
+snippet vD "vDash" A
+\vDash
+endsnippet
+
+context "math()"
+snippet Vd "Vdash" A
+\Vdash
+endsnippet

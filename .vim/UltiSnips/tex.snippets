@@ -3,6 +3,10 @@ def math():
     return vim.eval('vimtex#syntax#in_mathzone()') == '1'
 endglobal
 
+snippet sec "section" wA
+\section*{$1}$0
+endsnippet
+
 snippet beg "begin{} / end{}" A
 \begin{$1}
 	$0
@@ -11,7 +15,7 @@ endsnippet
 
 # math mode
 
-snippet lmm "in-line math" A
+snippet $ "in-line math" A
 $${1}$`!p
 if t[2] and t[2][0] not in [',', '.', '?', '-', ' ']:
     snip.rv = ' '
@@ -20,7 +24,7 @@ else:
 `$2
 endsnippet
 
-snippet dmm "display math" A
+snippet md "display math" A
 \[$1\] $0
 endsnippet
 
@@ -34,29 +38,8 @@ snippet '([A-Za-z])_(\d\d)' "auto subscript2" wrA
 `!p snip.rv = match.group(1)`_{`!p snip.rv = match.group(2)`}
 endsnippet
 
-# fractions
-
-snippet // "Fraction" iA
+snippet fr "Fraction" iA
 \\frac{$1}{$2}$0
-endsnippet
-
-snippet '((\d+)|(\d*)(\\)?([A-Za-z]+)((\^|_)(\{\d+\}|\d))*)/' "Fraction" wrA
-\\frac{`!p snip.rv = match.group(1)`}{$1}$0
-endsnippet
-
-priority 1000
-snippet '^.*\)/' "() Fraction" wrA
-`!p
-stripped = match.string[:-1]
-depth = 0
-i = len(stripped) - 1
-while True:
-	if stripped[i] == ')': depth += 1
-	if stripped[i] == '(': depth -= 1
-	if depth == 0: break;
-	i -= 1
-snip.rv = stripped[0:i] + "\\frac{" + stripped[i+1:-1] + "}"
-`{$1}$0
 endsnippet
 
 # Basic proof symbols
@@ -104,7 +87,12 @@ snippet mbf "mathbf" iA
 endsnippet
 
 context "math()"
-snippet vd "vdash" A
+snippet mbb "mathbb" iA
+\mathbb{$1}$0
+endsnippet 
+
+context "math()"
+snippet vd "vdash" iA
 \vdash
 endsnippet
 
@@ -114,6 +102,6 @@ snippet vD "vDash" A
 endsnippet
 
 context "math()"
-snippet Vd "Vdash" A
+snippet Vd "Vdash" iA
 \Vdash
 endsnippet

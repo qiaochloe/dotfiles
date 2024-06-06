@@ -17,6 +17,11 @@ source $(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme
 alias config='/usr/bin/git --git-dir=/Users/qiaochloe/.cfg/ --work-tree=/Users/qiaochloe' # DOTFILES (.cfg repo)
 alias path='echo $PATH | tr -s ":" "\n"' # PRETTY PRINT THE PATH
 
+# VIM BINDINGS
+bindkey -v
+# Avoid the annoying backspace/delete issue where backspace stops deleting characters
+bindkey -v '^?' backward-delete-char
+
 # THE FUCK
 eval $(thefuck --alias)
 
@@ -53,6 +58,8 @@ eval "$(rbenv init - zsh)"
 
 # RUST
 export PATH="$HOME/.cargo/bin:$PATH"
+
+# CONDA
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$('/opt/homebrew/Caskroom/miniforge/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
@@ -67,4 +74,7 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
+
+# opam configuration
+[[ ! -r /Users/qiaochloe/.opam/opam-init/init.zsh ]] || source /Users/qiaochloe/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
 

@@ -1,0 +1,19 @@
+name: Trigger Target Repository Workflow
+
+on:
+  push:
+    branches:
+      - main  # or the branch you want to track
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Trigger Target Repository
+      run: |
+        curl -X POST \
+          -H "Accept: application/vnd.github.v3+json" \
+          -H "Authorization: token ${{ CHLOE_PAT }}" \
+          https://api.github.com/repos/qiaochloe/cq-blog/dispatches \
+          -d '{"event_type":"sync-trigger"}'

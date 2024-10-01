@@ -8,6 +8,9 @@ fi
 # PATH
 export PATH=~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
+# GO
+export PATH=/Users/qiaochloe/go/bin:$PATH
+
 # HOMEBREW
 export PATH="/opt/homebrew/bin:$PATH"
 
@@ -77,4 +80,3 @@ unset __conda_setup
 
 # opam configuration
 [[ ! -r /Users/qiaochloe/.opam/opam-init/init.zsh ]] || source /Users/qiaochloe/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
-

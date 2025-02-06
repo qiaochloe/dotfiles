@@ -13,7 +13,6 @@ export PATH=/Users/qiaochloe/go/bin:$PATH
 
 # HOMEBREW
 export PATH="/opt/homebrew/bin:$PATH"
-
 source $(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme
 
 # ALIASES
@@ -80,3 +79,14 @@ unset __conda_setup
 
 # opam configuration
 [[ ! -r /Users/qiaochloe/.opam/opam-init/init.zsh ]] || source /Users/qiaochloe/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
+
+# pnpm
+export PNPM_HOME="/Users/qiaochloe/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+
+# podman
+PATH=/opt/podman/bin:$PATH

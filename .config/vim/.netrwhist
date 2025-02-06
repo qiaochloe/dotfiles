@@ -1,0 +1,7 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =5
+let g:netrw_dirhist_5='/Users/qiaochloe/.config/nvim'
+let g:netrw_dirhist_4='/Users/qiaochloe/Documents/college/extracurriculars/csci-1951x-ta/autograder/autograder-main'
+let g:netrw_dirhist_3='/Users/qiaochloe/Documents/college/courses/csci-0300/home/cs300-s24-projects-qiaochloe/snake'
+let g:netrw_dirhist_2='/Users/qiaochloe/.vim'
+let g:netrw_dirhist_1='/Users/qiaochloe/Documents/college/courses/csci-1470/final-project/.git'

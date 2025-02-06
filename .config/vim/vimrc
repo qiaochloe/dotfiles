@@ -3,7 +3,8 @@
 " set visuals
 set termguicolors " enable gui color 
 syntax enable " enable syntax processing
-colorscheme one-monokai " https://github.com/fratajczak/one-monokai-vim
+colorscheme monokai_pro
+" colorscheme one-monokai " https://github.com/fratajczak/one-monokai-vim
 
 " change cursor modes for iTerm2
 " 1 -> bar
@@ -27,8 +28,11 @@ set ttyfast
 set expandtab " tabs are spaces
 set number " show line numbers
 set relativenumber " show relative line numbers
+" set scrolloff=20
 
-filetype plugin indent on
+filetype on 
+filetype plugin on
+filetype indent on
 set autoindent
 
 set tabstop=4 " number of visual spaces per TAB
@@ -45,16 +49,13 @@ set hlsearch " highlight matches
 " move vertically by visual line rather than line break
 nnoremap j gj
 nnoremap k gk
-
 " map Y in line with C and D
 nnoremap Y y$
-
 " move to beginning/end of line
 " cmd-h mapped to ^ in iTerm
 " cmd-l mapped to $ in iTerm
-
-" highlight last inserted text
-" nnoremap gV `[v`]
+nnoremap <C-h> ^
+nnoremap <C-l> $
 
 let mapleader=","
 
@@ -64,17 +65,23 @@ set visualbell " remove the beeping
 
 :set clipboard=unnamed " use system clipboard for y and p
 " :set textwidth=120
+
+set mouse=a
+map <ScrollWheelUp> <C-Y>
+map <ScrollWheelDown> <C-E>
+
 " vim-plug: https://github.com/junegunn/vim-plug
 " Default plugin directory is '~/.vim/plugged'
 " Run :PlugInstall to install plugins
 call plug#begin()
+Plug 'phanviet/vim-monokai-pro' " Theme
+Plug 'github/copilot.vim' " GitHub Copilot
 Plug 'lervag/vimtex', { 'tag': 'v2.15' } 
-filetype plugin indent on " necessary for vimtex
+" note that filetype plugin indent on is necessary for vimtex
 let g:tex_flavor='latex' 
-let g:vimtex_view_method = 'zathura' " viewer method
+let g:vimtex_view_method = 'skim' " viewer method
 let g:vimtex_compiler_method = 'latexmk' " default compiler backend
-set conceallevel=1 " makes latex code invisible when your cursor not on line 
-let g:tex_conceal='abmg' " configure concealment
+" let g:tex_conceal='abmg' " configure concealment
 hi! clear Conceal " manually specifies highlight group for conceal characters
 
 Plug 'sirver/ultisnips'
@@ -82,5 +89,16 @@ let g:UltiSnipsSnippetDirectories = ['~/.vim/UltiSnips/']
 let g:UltiSnipsExpandTrigger="<c-tab>"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+
+" Plug 'vimwiki/vimwiki'
+" let g:vimwiki_list = [{'path': '~/.vim/vimwiki/', 'path_html': '~/.vim/vimwiki/'}]
+
+" Plug 'hrsh7th/vim-vsnip'
+" Plug 'hrsh7th/vim-vsnip-integ'
+" let g:vsnip_snippet_dir = expand('~/.vim/UltiSnips')
+" imap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
+" smap <expr> <Tab>   vsnip#jumpable(1)   ? '<Plug>(vsnip-jump-next)'      : '<Tab>'
+
+" Plug 'tpope/vim-commentary'
 
 call plug#end()

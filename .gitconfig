@@ -1,0 +1,52 @@
+[user]
+	name = Chloe Qiao
+	email = qiaochloe@gmail.com
+
+[alias]
+    plog = log --graph --pretty=format:'%C(red)%h%Creset -%C(green)%d%Creset %s %C(yellow)(%cr) %C(blue)[%an]%Creset' --abbrev-commit 
+    f = fetch
+    st = status
+    co = commit
+    com = commit -m
+    ch = checkout
+    chb = checkout -b
+    br = branch
+
+[commit]
+	verbose = true
+
+[core]
+	pager = diff-so-fancy | less --tabs=4 -RFX
+	editor = nvim
+	excludesfile = ~/.gitignore
+	autocrlf = false
+	safecrlf = false
+
+[interactive]
+	diffFilter = diff-so-fancy --patch
+
+[init]
+	defaultBranch = main
+
+[merge]
+	conflictStyle = zdiff3
+	tool = nvimdiff2
+
+[pull]
+	rebase = false
+
+[push]
+	autoSetupRemote = true
+
+; fsckobjects is to detect data corruption eagerly 
+; prune is to automatically delete remote branches that have been removed
+[transfer]
+	fsckobjects = true
+
+[fetch]
+	fsckobjects = true
+	prune = true
+	prunetags = true
+
+[receive]
+	fsckobjects = true

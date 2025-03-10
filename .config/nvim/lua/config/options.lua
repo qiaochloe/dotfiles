@@ -7,6 +7,9 @@ vim.g.snacks_animate = false
 vim.g.lazyvim_cmp = "nvim-cmp" -- As opposed to blink.cmp
 vim.g.lazyvim_picker = "telescope" -- As opposed to fzf
 
+vim.opt.encoding = "utf-8"
+vim.opt.fileencoding = "utf-8"
+
 vim.opt.relativenumber = false
 vim.opt.breakindent = true
 vim.opt.conceallevel = 0 -- Don't hide * markup in markdown files

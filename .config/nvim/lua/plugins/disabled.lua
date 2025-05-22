@@ -1,10 +1,10 @@
 return {
-  { -- Replace blink with nvim-cmp
-    "saghen/blink.cmp",
-    enabled = false,
-  },
   { -- Replace mini.pairs with nvim-autopairs
     "echasnovski/mini.pairs",
+    disabled = true,
+  },
+  { -- Disable flash.nvim
+    "folke/flash.nvim",
     enabled = false,
   },
   { -- Disable vertical indent lines animation, smooth scrolling, dashboard

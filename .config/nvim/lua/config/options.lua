@@ -4,7 +4,6 @@
 
 -- Disable some default options from LazyVim
 vim.g.snacks_animate = false
-vim.g.lazyvim_cmp = "nvim-cmp" -- As opposed to blink.cmp
 vim.g.lazyvim_picker = "telescope" -- As opposed to fzf
 
 vim.opt.encoding = "utf-8"

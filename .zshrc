@@ -18,6 +18,7 @@ source $(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme
 # ALIASES
 alias config='/usr/bin/git --git-dir=/Users/qiaochloe/.cfg/ --work-tree=/Users/qiaochloe' # DOTFILES (.cfg repo)
 alias path='echo $PATH | tr -s ":" "\n"' # PRETTY PRINT THE PATH
+alias c='clear'
 
 # VIM BINDINGS
 bindkey -v
@@ -28,7 +29,7 @@ bindkey -v '^?' backward-delete-char
 eval $(thefuck --alias)
 
 # ZOXIDE
-eval "$(zoxide init --cmd cd --hook prompt zsh)"
+eval "$(zoxide init --hook prompt zsh)"
 
 # CONDA
 __conda_setup="$('/opt/homebrew/Caskroom/miniforge/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
@@ -90,3 +91,9 @@ esac
 
 # podman
 PATH=/opt/podman/bin:$PATH
+
+# X11
+PATH=/opt/X11/bin:$PATH
+
+# Added by CCC installer
+export PATH="$HOME/.local/bin:$PATH"

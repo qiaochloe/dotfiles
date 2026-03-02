@@ -68,28 +68,37 @@ return {
     event = "InsertEnter",
     config = function()
       require("nvim-autopairs").setup()
-      -- Pair $ with $ in LaTeX and Typst
       local npairs = require("nvim-autopairs")
       local Rule = require("nvim-autopairs.rule")
       npairs.add_rules({
         Rule("$", "$", { "typ", "tex", "latex", "typst" })
-          -- Ensure it doesn't pair inside an existing $$
           :with_pair(function(opts)
             local line = opts.line
             local col = opts.col
             return line:sub(col - 1, col - 1) ~= "$"
           end)
-          -- Move right if the next character is `$`
           :with_move(function(opts)
             return opts.next_char == "$"
           end),
-        -- Allow deletion only if both `$` are present
-        -- :with_del(function(opts)
-        --   local prev_char = opts.prev_char
-        --   local next_char = opts.next_char
-        --   return prev_char == '$' and next_char == '$'
-        -- end)
-        -- :use_key '$$',
+      })
+    end,
+  },
+  { -- Don't let autotag bind ">" so multicursor gets it (vim.on_key needs typed=">")
+    "windwp/nvim-ts-autotag",
+    lazy = false,
+    config = function()
+      require("nvim-ts-autotag").setup({ opts = { enable_close = false } })
+      -- Remove ">" keymap if another code path set it (e.g. treesitter attach before our setup)
+      vim.api.nvim_create_autocmd({ "BufEnter", "FileType" }, {
+        callback = function(args)
+          local bufnr = args.buf
+          vim.defer_fn(function()
+            if not vim.api.nvim_buf_is_valid(bufnr) then
+              return
+            end
+            pcall(vim.keymap.del, "i", ">", { buffer = bufnr })
+          end, 50)
+        end,
       })
     end,
   },

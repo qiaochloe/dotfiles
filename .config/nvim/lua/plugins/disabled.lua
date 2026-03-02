@@ -29,7 +29,7 @@ return {
   },
   { -- Disable messages, command line, and pop-up menu
     "folke/noice.nvim",
-    enabled = false,
+    enabled = true,
   },
   { -- Disable fancy tab pages
     "akinsho/bufferline.nvim",

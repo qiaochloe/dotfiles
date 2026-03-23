@@ -1,6 +1,6 @@
 return {
   { -- Replace mini.pairs with nvim-autopairs
-    "echasnovski/mini.pairs",
+    "nvim-mini/mini.pairs",
     disabled = true,
   },
   { -- Disable flash.nvim
@@ -42,7 +42,7 @@ return {
     },
   },
   { -- Disable icons
-    "echasnovski/mini.icons",
+    "nvim-mini/mini.icons",
     enabled = false,
   },
   { -- Disable which-key

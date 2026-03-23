@@ -21,7 +21,7 @@ return {
     },
   },
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     opts = { ensure_installed = { "markdown-toc" } },
   },
   {
@@ -99,7 +99,6 @@ return {
   -- MDX
   {
     "davidmh/mdx.nvim",
-    config = true,
     dependencies = { "nvim-treesitter/nvim-treesitter" },
   },
 }

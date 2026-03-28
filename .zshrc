@@ -17,16 +17,14 @@ source $(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme
 
 # ALIASES
 alias config='/usr/bin/git --git-dir=/Users/qiaochloe/.cfg/ --work-tree=/Users/qiaochloe' # DOTFILES (.cfg repo)
-alias path='echo $PATH | tr -s ":" "\n"' # PRETTY PRINT THE PATH
 alias c='clear'
+alias lazyvim="NVIM_APPNAME=lazyvim nvim"
+alias path='echo $PATH | tr -s ":" "\n"' # PRETTY PRINT THE PATH
 
 # VIM BINDINGS
 bindkey -v
 # Avoid the annoying backspace/delete issue where backspace stops deleting characters
 bindkey -v '^?' backward-delete-char
-
-# THE FUCK
-eval $(thefuck --alias)
 
 # ZOXIDE
 eval "$(zoxide init --hook prompt zsh)"
@@ -97,3 +95,4 @@ PATH=/opt/X11/bin:$PATH
 
 # Added by CCC installer
 export PATH="$HOME/.local/bin:$PATH"
+export PATH="/opt/homebrew/opt/binutils/bin:$PATH"

@@ -11,6 +11,8 @@
     ch = checkout
     chb = checkout -b
     br = branch
+    d = diff
+
 
 [commit]
 	verbose = true

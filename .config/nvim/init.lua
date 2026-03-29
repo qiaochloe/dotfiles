@@ -9,7 +9,7 @@
 -- See `:help mapleader`
 --  NOTE: Set before plugins or wrong leader will be used
 vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
+vim.g.maplocalleader = '\\'
 vim.g.have_nerd_font = false -- No Nerd Font installed
 
 -- [[ Setting options ]]
@@ -64,6 +64,39 @@ vim.o.confirm = true
 -- [[ Basic Keymaps ]]
 -- See `:help vim.keymap.set()`
 
+-- Better up and down
+vim.keymap.set({ 'n', 'x' }, 'j', "v:count == 0 ? 'gj' : 'j'", { desc = 'Down', expr = true, silent = true })
+vim.keymap.set({ 'n', 'x' }, '<Down>', "v:count == 0 ? 'gj' : 'j'", { desc = 'Down', expr = true, silent = true })
+vim.keymap.set({ 'n', 'x' }, 'k', "v:count == 0 ? 'gk' : 'k'", { desc = 'Up', expr = true, silent = true })
+vim.keymap.set({ 'n', 'x' }, '<Up>', "v:count == 0 ? 'gk' : 'k'", { desc = 'Up', expr = true, silent = true })
+
+-- Resize window using <ctrl> arrow keys
+vim.keymap.set('n', '<C-Up>', '<cmd>resize +2<cr>', { desc = 'Increase window height' })
+vim.keymap.set('n', '<C-Down>', '<cmd>resize -2<cr>', { desc = 'Decrease window height' })
+vim.keymap.set('n', '<C-Left>', '<cmd>vertical resize -2<cr>', { desc = 'Decrease window width' })
+vim.keymap.set('n', '<C-Right>', '<cmd>vertical resize +2<cr>', { desc = 'Increase window width' })
+
+-- Saner behavior of n and N
+-- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
+vim.keymap.set('n', 'n', "'Nn'[v:searchforward].'zv'", { expr = true, desc = 'Next search result' })
+vim.keymap.set('x', 'n', "'Nn'[v:searchforward]", { expr = true, desc = 'Next search result' })
+vim.keymap.set('o', 'n', "'Nn'[v:searchforward]", { expr = true, desc = 'Next search result' })
+vim.keymap.set('n', 'N', "'nN'[v:searchforward].'zv'", { expr = true, desc = 'Prev search result' })
+vim.keymap.set('x', 'N', "'nN'[v:searchforward]", { expr = true, desc = 'Prev search result' })
+vim.keymap.set('o', 'N', "'nN'[v:searchforward]", { expr = true, desc = 'Prev search result' })
+
+-- Better indenting
+vim.keymap.set('x', '<', '<gv')
+vim.keymap.set('x', '>', '>gv')
+
+-- Commenting
+vim.keymap.set('n', 'gco', 'o<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>', { desc = 'Add comment below' })
+vim.keymap.set('n', 'gcO', 'O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>', { desc = 'Add comment above' })
+
+-- Misc
+vim.keymap.set('n', 'U', '<C-R>', { desc = 'Redo last change' })
+vim.keymap.set('n', '<leader>qq', '<cmd>qa<cr>', { desc = 'Quit All' })
+
 -- Clear highlights on search when pressing <Esc> in normal mode
 -- See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
@@ -83,7 +116,8 @@ vim.diagnostic.config {
   jump = { float = true },
 }
 
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Quickfix list' })
+vim.keymap.set('n', '<leader>cd', vim.diagnostic.open_float, { desc = 'Line diagnostics' })
 
 -- Keybinds to make split navigation easier.
 -- See `:help wincmd` for a list of all window commands
@@ -144,20 +178,56 @@ rtp:prepend(lazypath)
 require('lazy').setup({
   { 'NMAC427/guess-indent.nvim', opts = {} },
 
-  { -- Add git related signs to the gutter, as well as utilities for managing changes
-    -- See `:help gitsigns` to understand what the configuration keys do
+  { -- Set git signs and manage git hunks
     'lewis6991/gitsigns.nvim',
-    ---@module 'gitsigns'
-    ---@type Gitsigns.Config
-    ---@diagnostic disable-next-line: missing-fields
     opts = {
       signs = {
-        add = { text = '+' }, ---@diagnostic disable-line: missing-fields
-        change = { text = '~' }, ---@diagnostic disable-line: missing-fields
-        delete = { text = '_' }, ---@diagnostic disable-line: missing-fields
-        topdelete = { text = '‾' }, ---@diagnostic disable-line: missing-fields
-        changedelete = { text = '~' }, ---@diagnostic disable-line: missing-fields
+        add = { text = '▎' },
+        change = { text = '▎' },
+        delete = { text = '' },
+        topdelete = { text = '' },
+        changedelete = { text = '▎' },
+        untracked = { text = '▎' },
       },
+      signs_staged = {
+        add = { text = '▎' },
+        change = { text = '▎' },
+        delete = { text = '' },
+        topdelete = { text = '' },
+        changedelete = { text = '▎' },
+      },
+      on_attach = function(buffer)
+        local gs = package.loaded.gitsigns
+        local function map(mode, l, r, desc) vim.keymap.set(mode, l, r, { buffer = buffer, desc = desc, silent = true }) end
+
+        map('n', ']h', function()
+          if vim.wo.diff then
+            vim.cmd.normal { ']c', bang = true }
+          else
+            gs.nav_hunk 'next'
+          end
+        end, 'Next hunk')
+        map('n', '[h', function()
+          if vim.wo.diff then
+            vim.cmd.normal { '[c', bang = true }
+          else
+            gs.nav_hunk 'prev'
+          end
+        end, 'Prev hunk')
+        map('n', ']H', function() gs.nav_hunk 'last' end, 'Last hunk')
+        map('n', '[H', function() gs.nav_hunk 'first' end, 'First hunk')
+        map({ 'n', 'x' }, '<leader>ghs', ':Gitsigns stage_hunk<CR>', 'Stage hunk')
+        map({ 'n', 'x' }, '<leader>ghr', ':Gitsigns reset_hunk<CR>', 'Reset hunk')
+        map('n', '<leader>ghS', gs.stage_buffer, 'Stage buffer')
+        map('n', '<leader>ghu', gs.undo_stage_hunk, 'Undo stage hunk')
+        map('n', '<leader>ghR', gs.reset_buffer, 'Reset buffer')
+        map('n', '<leader>ghp', gs.preview_hunk_inline, 'Preview hunk inline')
+        map('n', '<leader>ghb', function() gs.blame_line { full = true } end, 'Blame line')
+        map('n', '<leader>ghB', function() gs.blame() end, 'Blame buffer')
+        map('n', '<leader>ghd', gs.diffthis, 'Diff this')
+        map('n', '<leader>ghD', function() gs.diffthis '~' end, 'Diff this ~')
+        map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', 'GitSigns select hunk')
+      end,
     },
   },
 
@@ -168,14 +238,20 @@ require('lazy').setup({
     ---@type wk.Opts
     ---@diagnostic disable-next-line: missing-fields
     opts = {
-      delay = 0, -- Delay between pressing a key and opening which-key (milliseconds)
+      delay = 500, -- Delay between pressing a key and opening which-key (ms)
       icons = { mappings = vim.g.have_nerd_font },
       spec = {
         { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
-        { '<leader>t', group = '[T]oggle' },
-        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
-        { 'gr', group = 'LSP Actions', mode = { 'n' } },
+        { '<leader>c', group = '[C]ode', mode = { 'n', 'v' } },
+        { '<leader>g', group = '[G]it', mode = { 'n', 'v' } },
+        { '<leader>gh', group = '[H]unk', mode = { 'n', 'v' } },
+        { '<leader>u', group = '[U]I', mode = { 'n', 'v' } },
+        { '<leader>q', hidden = true },
       },
+      plugins = {
+        marks = true,
+      },
+      preset = 'helix', -- Show to the side
     },
   },
 
@@ -209,17 +285,15 @@ require('lazy').setup({
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
-      vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
-      vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-      vim.keymap.set('n', '<leader><leadeR>', builtin.find_files, { desc = '[S]earch [F]iles' })
-      vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-      vim.keymap.set({ 'n', 'v' }, '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
-      vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
-      vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
-      vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set('n', '<leader>sc', builtin.commands, { desc = '[S]earch [C]ommands' })
-      vim.keymap.set('n', '<leader>sb', builtin.buffers, { desc = '[ ] Find existing buffers' })
+      vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = 'Search help' })
+      vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = 'Search keymaps' })
+      vim.keymap.set('n', '<leader><leader>', builtin.find_files, { desc = 'Search files' })
+      vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = 'Search select telescope' })
+      vim.keymap.set({ 'n', 'v' }, '<leader>sw', builtin.grep_string, { desc = 'Search current word' })
+      vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = 'Search grep' })
+      vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = 'Search diagnostics' })
+      vim.keymap.set('n', '<leader>sc', builtin.commands, { desc = 'Search commands' })
+      vim.keymap.set('n', '<leader>sb', builtin.buffers, { desc = 'Search buffers' })
 
       -- This runs on LSP attach per buffer
       -- (see main LSP attach function in 'neovim/nvim-lspconfig' config for more info
@@ -229,17 +303,17 @@ require('lazy').setup({
         callback = function(event)
           local buf = event.buf
           -- Find references for the word under your cursor.
-          vim.keymap.set('n', 'gr', builtin.lsp_references, { buffer = buf, desc = '[G]oto [R]eferences' })
+          vim.keymap.set('n', 'gr', builtin.lsp_references, { buffer = buf, desc = 'Goto references' })
           -- Jump to the implementation of the word under your cursor
-          vim.keymap.set('n', 'gI', builtin.lsp_implementations, { buffer = buf, desc = '[G]oto [I]mplementation' })
+          vim.keymap.set('n', 'gI', builtin.lsp_implementations, { buffer = buf, desc = 'Goto implementation' })
           -- Jump to the definition of the word under your cursor
-          vim.keymap.set('n', 'gd', builtin.lsp_definitions, { buffer = buf, desc = '[G]oto [D]efinition' })
+          vim.keymap.set('n', 'gd', builtin.lsp_definitions, { buffer = buf, desc = 'Goto definition' })
           -- Fuzzy find all the symbols in your current document
-          vim.keymap.set('n', 'gO', builtin.lsp_document_symbols, { buffer = buf, desc = 'Open Document Symbols' })
+          vim.keymap.set('n', 'gO', builtin.lsp_document_symbols, { buffer = buf, desc = 'Open document symbols' })
           -- Fuzzy find all the symbols in your current workspace
-          vim.keymap.set('n', 'gW', builtin.lsp_dynamic_workspace_symbols, { buffer = buf, desc = 'Open Workspace Symbols' })
+          vim.keymap.set('n', 'gW', builtin.lsp_dynamic_workspace_symbols, { buffer = buf, desc = 'Open workspace symbols' })
           -- Jump to the type of the word under your cursor
-          vim.keymap.set('n', 'gt', builtin.lsp_type_definitions, { buffer = buf, desc = '[G]oto [T]ype Definition' })
+          vim.keymap.set('n', 'gt', builtin.lsp_type_definitions, { buffer = buf, desc = 'Goto type definition' })
         end,
       })
 
@@ -267,11 +341,11 @@ require('lazy').setup({
             prompt_title = 'Live Grep in Open Files',
           }
         end,
-        { desc = '[S]earch [/] in Open Files' }
+        { desc = 'Search [/] in open files' }
       )
 
       -- Shortcut for searching your Neovim configuration files
-      vim.keymap.set('n', '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config' } end, { desc = '[S]earch [N]eovim files' })
+      vim.keymap.set('n', '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config' } end, { desc = 'Search Neovim files' })
     end,
   },
 
@@ -305,18 +379,18 @@ require('lazy').setup({
           -- It sets the mode, buffer and description for us each time
           local map = function(keys, func, desc, mode)
             mode = mode or 'n'
-            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
+            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = desc })
           end
 
           -- Rename the variable under your cursor.
           --  Most Language Servers support renaming across files, etc.
-          map('<leader>cr', vim.lsp.buf.rename, 'Rename')
+          map('<leader>cr', vim.lsp.buf.rename, 'Rename variable')
 
           -- Execute a code action, usually your cursor needs to be on top of an error
           -- or a suggestion from your LSP for this to activate.
-          map('<leader>ca', vim.lsp.buf.code_action, 'Code Action', { 'n', 'x' })
+          map('<leader>ca', vim.lsp.buf.code_action, 'Code action', { 'n', 'x' })
 
-          map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+          map('gD', vim.lsp.buf.declaration, 'Goto declaration')
 
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
@@ -345,11 +419,6 @@ require('lazy').setup({
                 vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
               end,
             })
-          end
-
-          -- Toggle inlay hints
-          if client and client:supports_method('textDocument/inlayHint', event.buf) then
-            map('<leader>th', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, '[T]oggle Inlay [H]ints')
           end
         end,
       })
@@ -396,14 +465,9 @@ require('lazy').setup({
       }
 
       -- Ensure the servers and tools above are installed
-      --
-      -- To check the current status of installed tools and/or manually install
-      -- other tools, you can run :Mason
+      -- To check the current status of installed tools and/or manually install other tools, you can run :Mason
       local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, {
-        -- You can add other tools here that you want Mason to install
-      })
-
+      vim.list_extend(ensure_installed, {})
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       for name, server in pairs(servers) do
@@ -422,7 +486,7 @@ require('lazy').setup({
         '<leader>cf',
         function() require('conform').format { async = true, lsp_format = 'fallback' } end,
         mode = '',
-        desc = '[F]ormat buffer',
+        desc = 'Format buffer',
       },
     },
     ---@module 'conform'
@@ -659,17 +723,17 @@ require('lazy').setup({
       {
         '<leader>ue',
         function() require('neo-tree.command').execute { toggle = true, dir = vim.uv.cwd() } end,
-        desc = 'Explorer NeoTree',
+        desc = 'File explorer',
       },
       {
         '<leader>ge',
         function() require('neo-tree.command').execute { source = 'git_status', toggle = true } end,
-        desc = 'Git Explorer',
+        desc = 'Git explorer',
       },
       {
         '<leader>be',
         function() require('neo-tree.command').execute { source = 'buffers', toggle = true } end,
-        desc = 'Buffer Explorer',
+        desc = 'Buffer explorer',
       },
     },
     deactivate = function() vim.cmd [[Neotree close]] end,
@@ -772,16 +836,167 @@ require('lazy').setup({
     end,
   },
 
-  { -- Disable indent
+  { -- Multicursor
+    'jake-stewart/multicursor.nvim',
+    branch = '1.0',
+    config = function()
+      local mc = require 'multicursor-nvim'
+      mc.setup()
+
+      -- Add a new cursor by matching word/selection
+      vim.keymap.set({ 'n', 'x' }, '<leader>n', function() mc.matchAddCursor(1) end, { desc = 'Add cursor' })
+      vim.keymap.set({ 'n', 'x' }, '<leader>N', function() mc.matchAddCursor(-1) end, { desc = 'Add cursor before' })
+
+      -- Add a cursor for all matches of cursor word/selection in the document.
+      vim.keymap.set({ 'n', 'x' }, '<leader>A', mc.matchAllAddCursors, { desc = 'Add cursor for all matches' })
+
+      -- Append/insert for each line of visual selections
+      vim.keymap.set('x', 'I', mc.insertVisual, { desc = 'Insert cursor' })
+      vim.keymap.set('x', 'A', mc.appendVisual, { desc = 'Append cursor' })
+
+      -- Add and remove cursors with control + left click.
+      vim.keymap.set('n', '<c-leftmouse>', mc.handleMouse)
+      vim.keymap.set('n', '<c-leftdrag>', mc.handleMouseDrag)
+      vim.keymap.set('n', '<c-leftrelease>', mc.handleMouseRelease)
+
+      -- Disable and enable cursors.
+      vim.keymap.set({ 'n', 'x' }, '<c-q>', mc.toggleCursor)
+
+      -- Disable autotag's > keymap when entering insert mode with multiple cursors,
+      -- then restore it on leave. Autotag uses a buffer-local keymap that conflicts
+      -- with multicursor's cursor replication.
+      local _autotag_detached = {}
+      vim.api.nvim_create_autocmd('InsertEnter', {
+        callback = function()
+          if mc.hasCursors() then
+            local bufnr = vim.api.nvim_get_current_buf()
+            require('nvim-ts-autotag.internal').detach(bufnr)
+            _autotag_detached[bufnr] = true
+          end
+        end,
+      })
+      vim.api.nvim_create_autocmd('InsertLeave', {
+        callback = function()
+          local bufnr = vim.api.nvim_get_current_buf()
+          if _autotag_detached[bufnr] then
+            _autotag_detached[bufnr] = nil
+            local autotag = require 'nvim-ts-autotag.internal'
+            autotag.detach(bufnr) -- reset buffer_tag so attach proceeds
+            autotag.attach(bufnr)
+          end
+        end,
+      })
+
+      -- Mappings defined in a keymap layer only apply when there are
+      -- multiple cursors. This lets you have overlapping mappings.
+      mc.addKeymapLayer(function(layerSet)
+        -- Select a different cursor as the main one.
+        layerSet({ 'n', 'x' }, '<left>', mc.prevCursor)
+        layerSet({ 'n', 'x' }, '<right>', mc.nextCursor)
+
+        -- Delete the main cursor.
+        layerSet({ 'n', 'x' }, '<leader>x', mc.deleteCursor)
+
+        -- Enable and clear cursors using escape.
+        layerSet('n', '<esc>', function()
+          if not mc.cursorsEnabled() then
+            mc.enableCursors()
+          else
+            mc.clearCursors()
+          end
+        end)
+      end)
+
+      -- Customize how cursors look.
+      local hl = vim.api.nvim_set_hl
+      hl(0, 'MultiCursorCursor', { link = 'Cursor' })
+      hl(0, 'MultiCursorVisual', { link = 'Visual' })
+      hl(0, 'MultiCursorSign', { link = 'SignColumn' })
+      hl(0, 'MultiCursorMatchPreview', { link = 'Search' })
+      hl(0, 'MultiCursorDisabledCursor', { link = 'Visual' })
+      hl(0, 'MultiCursorDisabledVisual', { link = 'Visual' })
+      hl(0, 'MultiCursorDisabledSign', { link = 'SignColumn' })
+    end,
+  },
+
+  { -- Misc small plugins, including most UI toggles
     'folke/snacks.nvim',
+    priority = 1000,
+    lazy = false,
     ---@type snacks.Config
     opts = {
       indent = {
+        enabled = true,
         animate = {
           enabled = false,
         },
       },
+      bigfile = { enabled = true },
+      gh = { enabled = true },
+      git = { enabled = true },
+      gitbrowse = { enabled = true },
+      lazygit = { enabled = true },
+      rename = { enabled = true },
     },
+    keys = {
+      -- Git utilities
+      { '<leader>gb', function() Snacks.picker.git_branches() end, desc = 'Git branch' },
+      { '<leader>gl', function() Snacks.picker.git_log() end, desc = 'Git log' },
+      { '<leader>gL', function() Snacks.picker.git_log_line() end, desc = 'Git log line' },
+      { '<leader>gs', function() Snacks.picker.git_status() end, desc = 'Git status' },
+      { '<leader>gS', function() Snacks.picker.git_stash() end, desc = 'Git stash' },
+      { '<leader>gd', function() Snacks.picker.git_diff() end, desc = 'Git diff hunks' },
+      { '<leader>gf', function() Snacks.picker.git_log_file() end, desc = 'Git log file' },
+      { '<leader>gi', function() Snacks.picker.gh_issue() end, desc = 'GitHub issues (open)' },
+      { '<leader>gI', function() Snacks.picker.gh_issue { state = 'all' } end, desc = 'GitHub issues (all)' },
+      { '<leader>gp', function() Snacks.picker.gh_pr() end, desc = 'GitHub pull requests (open)' },
+      { '<leader>gP', function() Snacks.picker.gh_pr { state = 'all' } end, desc = 'GitHub pull requests (all)' },
+      { '<leader>gB', function() Snacks.gitbrowse() end, desc = 'Git browse', mode = { 'n', 'v' } },
+      { '<leader>gg', function() Snacks.lazygit() end, desc = 'Lazygit' },
+      { '<leader>cR', function() Snacks.rename.rename_file() end, desc = 'Rename File' },
+    },
+    init = function()
+      vim.api.nvim_create_autocmd('User', {
+        pattern = 'VeryLazy',
+        callback = function()
+          -- Toggle mappings
+          Snacks.toggle.option('spell', { name = 'spelling' }):map '<leader>us'
+          Snacks.toggle.option('wrap', { name = 'wrap' }):map '<leader>uw'
+          Snacks.toggle.diagnostics({ name = 'diagnostics' }):map '<leader>ud'
+          Snacks.toggle.inlay_hints():map '<leader>uh'
+          Snacks.toggle.indent():map '<leader>ui'
+          Snacks.toggle.dim():map '<leader>uD'
+        end,
+      })
+    end,
+  },
+
+  { -- Search and replace
+    'MagicDuck/grug-far.nvim',
+    opts = { headerMaxWidth = 80 },
+    cmd = { 'GrugFar', 'GrugFarWithin' },
+    keys = {
+      {
+        '<leader>sr',
+        function()
+          local grug = require 'grug-far'
+          local ext = vim.bo.buftype == '' and vim.fn.expand '%:e'
+          grug.open {
+            transient = true,
+            prefills = {
+              filesFilter = ext and ext ~= '' and '*.' .. ext or nil,
+            },
+          }
+        end,
+        mode = { 'n', 'x' },
+        desc = 'Search and replace',
+      },
+    },
+  },
+
+  { -- Gutter marks
+    'dimtion/guttermarks.nvim',
+    event = { 'BufReadPost', 'BufNewFile', 'BufWritePre', 'FileType' },
   },
 
   { -- Autopairs
@@ -790,6 +1005,19 @@ require('lazy').setup({
     event = 'InsertEnter',
     config = true,
     opts = {},
+  },
+
+  { -- Autotags
+    'windwp/nvim-ts-autotag',
+    config = function()
+      require('nvim-ts-autotag').setup {
+        opts = {
+          enable_close = true, -- Auto close tags
+          enable_rename = true, -- Auto rename pairs of tags
+          enable_close_on_slash = false, -- Auto close on trailing </
+        },
+      }
+    end,
   },
 
   { -- Tabout parens, brackets, quotes, etc
@@ -829,7 +1057,6 @@ require('lazy').setup({
     },
   },
 
-  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommended keymaps
   -- require 'kickstart.plugins.lint',
 
   -- Automatically add plugins, configuration, etc from `lua/custom/plugins/*.lua`

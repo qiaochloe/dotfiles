@@ -66,7 +66,7 @@ vim.o.confirm = true
 vim.o.formatoptions = 'croql'
 
 -- Set fold
-vim.o.foldcolumn = '0'
+vim.o.foldcolumn = '0' -- Disable fold gutter
 vim.o.foldlevel = 99
 vim.o.foldlevelstart = 99
 vim.o.foldenable = true
@@ -186,61 +186,6 @@ rtp:prepend(lazypath)
 -- Use the `dependencies` key to specify the dependencies of a particular plugin
 
 require('lazy').setup({
-  { 'NMAC427/guess-indent.nvim', opts = {} },
-
-  { -- Set git signs and manage git hunks
-    'lewis6991/gitsigns.nvim',
-    opts = {
-      signs = {
-        add = { text = '▎' },
-        change = { text = '▎' },
-        delete = { text = '' },
-        topdelete = { text = '' },
-        changedelete = { text = '▎' },
-        untracked = { text = '▎' },
-      },
-      signs_staged = {
-        add = { text = '▎' },
-        change = { text = '▎' },
-        delete = { text = '' },
-        topdelete = { text = '' },
-        changedelete = { text = '▎' },
-      },
-      on_attach = function(buffer)
-        local gs = package.loaded.gitsigns
-        local function map(mode, l, r, desc) vim.keymap.set(mode, l, r, { buffer = buffer, desc = desc, silent = true }) end
-
-        map('n', ']h', function()
-          if vim.wo.diff then
-            vim.cmd.normal { ']c', bang = true }
-          else
-            gs.nav_hunk 'next'
-          end
-        end, 'Next hunk')
-        map('n', '[h', function()
-          if vim.wo.diff then
-            vim.cmd.normal { '[c', bang = true }
-          else
-            gs.nav_hunk 'prev'
-          end
-        end, 'Prev hunk')
-        map('n', ']H', function() gs.nav_hunk 'last' end, 'Last hunk')
-        map('n', '[H', function() gs.nav_hunk 'first' end, 'First hunk')
-        map({ 'n', 'x' }, '<leader>ghs', ':Gitsigns stage_hunk<CR>', 'Stage hunk')
-        map({ 'n', 'x' }, '<leader>ghr', ':Gitsigns reset_hunk<CR>', 'Reset hunk')
-        map('n', '<leader>ghS', gs.stage_buffer, 'Stage buffer')
-        map('n', '<leader>ghu', gs.undo_stage_hunk, 'Undo stage hunk')
-        map('n', '<leader>ghR', gs.reset_buffer, 'Reset buffer')
-        map('n', '<leader>ghp', gs.preview_hunk_inline, 'Preview hunk inline')
-        map('n', '<leader>ghb', function() gs.blame_line { full = true } end, 'Blame line')
-        map('n', '<leader>ghB', function() gs.blame() end, 'Blame buffer')
-        map('n', '<leader>ghd', gs.diffthis, 'Diff this')
-        map('n', '<leader>ghD', function() gs.diffthis '~' end, 'Diff this ~')
-        map({ 'o', 'x' }, 'ih', ':<C-U>Gitsigns select_hunk<CR>', 'GitSigns select hunk')
-      end,
-    },
-  },
-
   { -- Show pending keybinds
     'folke/which-key.nvim',
     event = 'VimEnter',
@@ -359,9 +304,7 @@ require('lazy').setup({
     end,
   },
 
-  -- LSP Plugins
-  {
-    -- Main LSP Configuration
+  { -- LSP
     'neovim/nvim-lspconfig',
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
@@ -523,54 +466,6 @@ require('lazy').setup({
     },
   },
 
-  { -- Folding
-    'kevinhwang91/nvim-ufo',
-    dependencies = { 'kevinhwang91/promise-async' },
-    config = function()
-      -- Use nvim lsp as lsp client
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      capabilities.textDocument.foldingRange = {
-        dynamicRegistration = false,
-        lineFoldingOnly = true,
-      }
-      local language_servers = vim.lsp.get_clients()
-      for _, ls in ipairs(language_servers) do
-        require('lspconfig')[ls].setup {
-          capabilities = capabilities,
-        }
-      end
-
-      local ufo = require 'ufo'
-      ufo.setup()
-      vim.keymap.set('n', 'zR', ufo.openAllFolds)
-      vim.keymap.set('n', 'zM', ufo.closeAllFolds)
-    end,
-  },
-
-  { -- Improved commenting
-    'nvim-mini/mini.comment',
-    event = 'VeryLazy',
-    opts = {
-      options = {
-        custom_commentstring = function() return require('ts_context_commentstring.internal').calculate_commentstring() or vim.bo.commentstring end,
-      },
-    },
-  },
-
-  { -- Improved commenting
-    'folke/ts-comments.nvim',
-    event = 'VeryLazy',
-    opts = {},
-  },
-
-  { -- Change comment type depending on context
-    'JoosepAlviste/nvim-ts-context-commentstring',
-    lazy = true,
-    opts = {
-      enable_autocmd = false,
-    },
-  },
-
   { -- Autocompletion
     'saghen/blink.cmp',
     event = 'VimEnter',
@@ -672,8 +567,7 @@ require('lazy').setup({
     end,
   },
 
-  -- Highlight todo, notes, etc in comments
-  {
+  { -- Highlight todo, notes, etc in comments
     'folke/todo-comments.nvim',
     event = 'VimEnter',
     dependencies = { 'nvim-lua/plenary.nvim' },
@@ -868,27 +762,6 @@ require('lazy').setup({
     end,
   },
 
-  { -- Splitting manager
-    'mrjones2014/smart-splits.nvim',
-    lazy = false,
-    config = function()
-      vim.keymap.set('n', '<C-h>', require('smart-splits').move_cursor_left)
-      vim.keymap.set('n', '<C-j>', require('smart-splits').move_cursor_down)
-      vim.keymap.set('n', '<C-k>', require('smart-splits').move_cursor_up)
-      vim.keymap.set('n', '<C-l>', require('smart-splits').move_cursor_right)
-    end,
-  },
-
-  { -- Prevent cursor from moving while yanking
-    'svban/YankAssassin.nvim',
-    config = function()
-      require('YankAssassin').setup {
-        auto_normal = true,
-        auto_visual = true,
-      }
-    end,
-  },
-
   { -- Multicursor
     'jake-stewart/multicursor.nvim',
     branch = '1.0',
@@ -972,58 +845,6 @@ require('lazy').setup({
     end,
   },
 
-  { -- Misc small plugins, including most UI toggles
-    'folke/snacks.nvim',
-    priority = 1000,
-    lazy = false,
-    ---@type snacks.Config
-    opts = {
-      indent = {
-        enabled = true,
-        animate = {
-          enabled = false,
-        },
-      },
-      bigfile = { enabled = true },
-      gh = { enabled = true },
-      git = { enabled = true },
-      gitbrowse = { enabled = true },
-      lazygit = { enabled = true },
-      rename = { enabled = true },
-    },
-    keys = {
-      -- Git utilities
-      { '<leader>gb', function() Snacks.picker.git_branches() end, desc = 'Git branch' },
-      { '<leader>gl', function() Snacks.picker.git_log() end, desc = 'Git log' },
-      { '<leader>gL', function() Snacks.picker.git_log_line() end, desc = 'Git log line' },
-      { '<leader>gs', function() Snacks.picker.git_status() end, desc = 'Git status' },
-      { '<leader>gS', function() Snacks.picker.git_stash() end, desc = 'Git stash' },
-      { '<leader>gd', function() Snacks.picker.git_diff() end, desc = 'Git diff hunks' },
-      { '<leader>gf', function() Snacks.picker.git_log_file() end, desc = 'Git log file' },
-      { '<leader>gi', function() Snacks.picker.gh_issue() end, desc = 'GitHub issues (open)' },
-      { '<leader>gI', function() Snacks.picker.gh_issue { state = 'all' } end, desc = 'GitHub issues (all)' },
-      { '<leader>gp', function() Snacks.picker.gh_pr() end, desc = 'GitHub pull requests (open)' },
-      { '<leader>gP', function() Snacks.picker.gh_pr { state = 'all' } end, desc = 'GitHub pull requests (all)' },
-      { '<leader>gB', function() Snacks.gitbrowse() end, desc = 'Git browse', mode = { 'n', 'v' } },
-      { '<leader>gg', function() Snacks.lazygit() end, desc = 'Lazygit' },
-      { '<leader>cR', function() Snacks.rename.rename_file() end, desc = 'Rename File' },
-    },
-    init = function()
-      vim.api.nvim_create_autocmd('User', {
-        pattern = 'VeryLazy',
-        callback = function()
-          -- Toggle mappings
-          Snacks.toggle.option('spell', { name = 'spelling' }):map '<leader>us'
-          Snacks.toggle.option('wrap', { name = 'wrap' }):map '<leader>uw'
-          Snacks.toggle.diagnostics({ name = 'diagnostics' }):map '<leader>ud'
-          Snacks.toggle.inlay_hints():map '<leader>uh'
-          Snacks.toggle.indent():map '<leader>ui'
-          Snacks.toggle.dim():map '<leader>uD'
-        end,
-      })
-    end,
-  },
-
   { -- Search and replace
     'MagicDuck/grug-far.nvim',
     opts = { headerMaxWidth = 80 },
@@ -1047,72 +868,53 @@ require('lazy').setup({
     },
   },
 
-  { -- Gutter marks
-    'dimtion/guttermarks.nvim',
-    event = { 'BufReadPost', 'BufNewFile', 'BufWritePre', 'FileType' },
-  },
-
-  { -- Autopairs
-    -- https://github.com/windwp/nvim-autopairs
-    'windwp/nvim-autopairs',
-    event = 'InsertEnter',
-    config = true,
-    opts = {},
-  },
-
-  { -- Autotags
-    'windwp/nvim-ts-autotag',
-    config = function()
-      require('nvim-ts-autotag').setup {
-        opts = {
-          enable_close = true, -- Auto close tags
-          enable_rename = true, -- Auto rename pairs of tags
-          enable_close_on_slash = false, -- Auto close on trailing </
-        },
-      }
-    end,
-  },
-
-  { -- Tabout parens, brackets, quotes, etc
-    'abecodes/tabout.nvim',
+  { -- Pane manager
+    'mrjones2014/smart-splits.nvim',
     lazy = false,
-    opt = true,
-    event = 'InsertCharPre',
-    priority = 1000,
     config = function()
-      require('tabout').setup {
-        tabkey = '<Tab>',
-        backwards_tabkey = '', -- Disabled
-        act_as_tab = true, -- Shift content if tab out is not possible
-        act_as_shift_tab = false, -- Reverse shift content if tab out is not possible
-        default_tab = '<C-t>', -- Shift default action
-        default_shift_tab = '<C-d>', -- Reverse shift default action
-        enable_backwards = true,
-        completion = false, -- if the tabkey is used in a completion
-        tabouts = {
-          { open = "'", close = "'" },
-          { open = '"', close = '"' },
-          { open = '`', close = '`' },
-          { open = '(', close = ')' },
-          { open = '[', close = ']' },
-          { open = '{', close = '}' },
-        },
-        -- If the cursor is at the beginning of a filled element
-        -- it will rather tab out than shift the content
-        ignore_beginning = true,
-        exclude = {},
-      }
+      vim.keymap.set('n', '<C-h>', require('smart-splits').move_cursor_left)
+      vim.keymap.set('n', '<C-j>', require('smart-splits').move_cursor_down)
+      vim.keymap.set('n', '<C-k>', require('smart-splits').move_cursor_up)
+      vim.keymap.set('n', '<C-l>', require('smart-splits').move_cursor_right)
     end,
-    dependencies = { -- These are optional
-      'nvim-treesitter/nvim-treesitter',
-      'L3MON4D3/LuaSnip',
-      'hrsh7th/nvim-cmp',
+  },
+
+  { -- UI toggles; see git utilites in git.lua
+    'folke/snacks.nvim',
+    priority = 1000,
+    lazy = false,
+    opts = {
+      indent = {
+        enabled = true,
+        animate = {
+          enabled = false,
+        },
+      },
+      bigfile = { enabled = true },
+      rename = { enabled = true },
     },
+    keys = {
+      { '<leader>rf', function() Snacks.rename.rename_file() end, desc = 'Rename File' },
+    },
+    init = function()
+      vim.api.nvim_create_autocmd('User', {
+        pattern = 'VeryLazy',
+        callback = function()
+          -- Toggle mappings
+          Snacks.toggle.option('spell', { name = 'spelling' }):map '<leader>us'
+          Snacks.toggle.option('wrap', { name = 'wrap' }):map '<leader>uw'
+          Snacks.toggle.diagnostics({ name = 'diagnostics' }):map '<leader>ud'
+          Snacks.toggle.inlay_hints():map '<leader>uh'
+          Snacks.toggle.indent():map '<leader>ui'
+          Snacks.toggle.dim():map '<leader>uD'
+        end,
+      })
+    end,
   },
 
   -- require 'kickstart.plugins.lint',
 
-  -- Automatically add plugins, configuration, etc from `lua/custom/plugins/*.lua`
+  -- Automatically add plugins from `lua/custom/plugins/*.lua`
   { import = 'custom.plugins' },
 }, { ---@diagnostic disable-line: missing-fields
 })

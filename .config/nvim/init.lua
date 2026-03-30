@@ -61,6 +61,16 @@ vim.o.scrolloff = 10 -- Number of lines to keep above and below cursor
 -- See `:help 'confirm'`
 vim.o.confirm = true
 
+-- Enable auto-wrap text (t), auto-wrap comments (c), auto-insert comment leader (r),
+-- format comments with gq (q), don't break long lines (l)
+vim.o.formatoptions = 'croql'
+
+-- Set fold
+vim.o.foldcolumn = '0'
+vim.o.foldlevel = 99
+vim.o.foldlevelstart = 99
+vim.o.foldenable = true
+
 -- [[ Basic Keymaps ]]
 -- See `:help vim.keymap.set()`
 
@@ -381,15 +391,8 @@ require('lazy').setup({
             mode = mode or 'n'
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = desc })
           end
-
-          -- Rename the variable under your cursor.
-          --  Most Language Servers support renaming across files, etc.
           map('<leader>cr', vim.lsp.buf.rename, 'Rename variable')
-
-          -- Execute a code action, usually your cursor needs to be on top of an error
-          -- or a suggestion from your LSP for this to activate.
           map('<leader>ca', vim.lsp.buf.code_action, 'Code action', { 'n', 'x' })
-
           map('gD', vim.lsp.buf.declaration, 'Goto declaration')
 
           -- The following two autocommands are used to highlight references of the
@@ -517,6 +520,54 @@ require('lazy').setup({
         lua = { 'stylua' },
         python = { 'isort', 'ruff' },
       },
+    },
+  },
+
+  { -- Folding
+    'kevinhwang91/nvim-ufo',
+    dependencies = { 'kevinhwang91/promise-async' },
+    config = function()
+      -- Use nvim lsp as lsp client
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      capabilities.textDocument.foldingRange = {
+        dynamicRegistration = false,
+        lineFoldingOnly = true,
+      }
+      local language_servers = vim.lsp.get_clients()
+      for _, ls in ipairs(language_servers) do
+        require('lspconfig')[ls].setup {
+          capabilities = capabilities,
+        }
+      end
+
+      local ufo = require 'ufo'
+      ufo.setup()
+      vim.keymap.set('n', 'zR', ufo.openAllFolds)
+      vim.keymap.set('n', 'zM', ufo.closeAllFolds)
+    end,
+  },
+
+  { -- Improved commenting
+    'nvim-mini/mini.comment',
+    event = 'VeryLazy',
+    opts = {
+      options = {
+        custom_commentstring = function() return require('ts_context_commentstring.internal').calculate_commentstring() or vim.bo.commentstring end,
+      },
+    },
+  },
+
+  { -- Improved commenting
+    'folke/ts-comments.nvim',
+    event = 'VeryLazy',
+    opts = {},
+  },
+
+  { -- Change comment type depending on context
+    'JoosepAlviste/nvim-ts-context-commentstring',
+    lazy = true,
+    opts = {
+      enable_autocmd = false,
     },
   },
 

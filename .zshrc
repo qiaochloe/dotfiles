@@ -95,4 +95,9 @@ PATH=/opt/X11/bin:$PATH
 
 # Added by CCC installer
 export PATH="$HOME/.local/bin:$PATH"
+
+# CSCI 1670 Weenix 2
 export PATH="/opt/homebrew/opt/binutils/bin:$PATH"
+
+# direnv
+eval "$(direnv hook zsh)"

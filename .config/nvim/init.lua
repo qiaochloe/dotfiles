@@ -106,6 +106,9 @@ vim.keymap.set('n', 'gcO', 'O<esc>Vcx<esc><cmd>normal gcc<cr>fxa<bs>', { desc = 
 -- Misc
 vim.keymap.set('n', 'U', '<C-R>', { desc = 'Redo last change' })
 vim.keymap.set('n', '<leader>qq', '<cmd>qa<cr>', { desc = 'Quit All' })
+vim.keymap.set('n', 'H', '<cmd>bprev<cr>', { desc = 'Previous buffer' })
+vim.keymap.set('n', 'L', '<cmd>bnext<cr>', { desc = 'Next buffer' })
+vim.keymap.set('n', '<leader>bd', '<cmd>bd<cr>', { desc = 'Delete buffer' })
 
 -- Clear highlights on search when pressing <Esc> in normal mode
 -- See `:help hlsearch`
@@ -596,6 +599,11 @@ require('lazy').setup({
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
 
+      -- Tabline
+      require('mini.tabline').setup {
+        show_icons = false,
+      }
+
       -- Statusline
       local statusline = require 'mini.statusline'
       statusline.setup {
@@ -614,9 +622,16 @@ require('lazy').setup({
             else
               size_str = string.format('%.1fM', size_bytes / (1024 * 1024))
             end
+            local available = vim.api.nvim_win_get_width(0) - #size_str
+            if #filepath > available then filepath = '<' .. filepath:sub(-(available - 1)) end
             return filepath .. '%=' .. size_str
           end,
-          inactive = function() return vim.fn.expand '%:p' end,
+          inactive = function()
+            local filepath = vim.fn.expand '%:p'
+            local available = vim.api.nvim_win_get_width(0)
+            if #filepath > available then filepath = '<' .. filepath:sub(-(available - 1)) end
+            return filepath
+          end,
         },
       }
     end,
@@ -910,6 +925,29 @@ require('lazy').setup({
         end,
       })
     end,
+  },
+
+  { -- AI
+    'coder/claudecode.nvim',
+    opts = {},
+    keys = {
+      { '<leader>a', '', desc = '+ai', mode = { 'n', 'v' } },
+      { '<leader>ac', '<cmd>ClaudeCode<cr>', desc = 'Toggle Claude' },
+      { '<leader>af', '<cmd>ClaudeCodeFocus<cr>', desc = 'Focus Claude' },
+      { '<leader>ar', '<cmd>ClaudeCode --resume<cr>', desc = 'Resume Claude' },
+      { '<leader>aC', '<cmd>ClaudeCode --continue<cr>', desc = 'Continue Claude' },
+      { '<leader>ab', '<cmd>ClaudeCodeAdd %<cr>', desc = 'Add current buffer' },
+      { '<leader>as', '<cmd>ClaudeCodeSend<cr>', mode = 'v', desc = 'Send to Claude' },
+      {
+        '<leader>as',
+        '<cmd>ClaudeCodeTreeAdd<cr>',
+        desc = 'Add file',
+        ft = { 'NvimTree', 'neo-tree', 'oil' },
+      },
+      -- Diff management
+      { '<leader>aa', '<cmd>ClaudeCodeDiffAccept<cr>', desc = 'Accept diff' },
+      { '<leader>ad', '<cmd>ClaudeCodeDiffDeny<cr>', desc = 'Deny diff' },
+    },
   },
 
   -- require 'kickstart.plugins.lint',

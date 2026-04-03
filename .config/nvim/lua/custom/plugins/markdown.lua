@@ -97,4 +97,8 @@ return {
     'davidmh/mdx.nvim',
     dependencies = { 'nvim-treesitter/nvim-treesitter' },
   },
+  {
+    'mason-org/mason.nvim',
+    opts = { ensure_installed = { 'mdx-analyzzer' } },
+  },
 }

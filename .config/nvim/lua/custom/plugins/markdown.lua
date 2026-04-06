@@ -36,7 +36,10 @@ return {
     'neovim/nvim-lspconfig',
     opts = {
       servers = {
-        marksman = {},
+        marksman = {
+          filetypes = { 'markdown', 'markdown.mdx' },
+        },
+        mdx_analyzer = {},
       },
     },
   },
@@ -99,6 +102,6 @@ return {
   },
   {
     'mason-org/mason.nvim',
-    opts = { ensure_installed = { 'mdx-analyzzer' } },
+    opts = { ensure_installed = { 'mdx-analyzer' } },
   },
 }

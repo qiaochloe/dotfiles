@@ -26,6 +26,7 @@ vim.o.showmode = false -- Don't show the mode
 vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
 
 vim.o.breakindent = true -- Enable break indent
+vim.o.linebreak = true -- Enable breaking by line
 vim.o.undofile = true -- Save undo history even after opening/closing files
 
 -- Case-insensitive searching UNLESS \C or
@@ -108,7 +109,28 @@ vim.keymap.set('n', 'U', '<C-R>', { desc = 'Redo last change' })
 vim.keymap.set('n', '<leader>qq', '<cmd>qa<cr>', { desc = 'Quit All' })
 vim.keymap.set('n', 'H', '<cmd>bprev<cr>', { desc = 'Previous buffer' })
 vim.keymap.set('n', 'L', '<cmd>bnext<cr>', { desc = 'Next buffer' })
-vim.keymap.set('n', '<leader>bd', '<cmd>bd<cr>', { desc = 'Delete buffer' })
+
+-- Delete current buffer and move to next hidden buffer
+vim.keymap.set('n', '<leader>bd', function()
+  local current = vim.api.nvim_get_current_buf()
+  local bufs = vim.tbl_filter(function(b) return vim.fn.buflisted(b) == 1 end, vim.api.nvim_list_bufs())
+
+  if #bufs <= 1 then
+    vim.cmd 'bd'
+    return
+  end
+
+  local next_buf = bufs[1]
+  for i, b in ipairs(bufs) do
+    if b == current then
+      next_buf = bufs[(i % #bufs) + 1]
+      break
+    end
+  end
+
+  vim.api.nvim_set_current_buf(next_buf)
+  vim.cmd('bd ' .. current)
+end, { desc = 'Delete buffer' })
 
 -- Clear highlights on search when pressing <Esc> in normal mode
 -- See `:help hlsearch`
@@ -326,56 +348,9 @@ require('lazy').setup({
       -- Useful status updates for LSP.
       { 'j-hui/fidget.nvim', opts = {} },
     },
-    config = function()
-      --  This function gets run when an LSP attaches to a particular buffer
-      vim.api.nvim_create_autocmd('LspAttach', {
-        group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
-        callback = function(event)
-          -- This function lets us more easily define mappings specific for LSP related items
-          -- It sets the mode, buffer and description for us each time
-          local map = function(keys, func, desc, mode)
-            mode = mode or 'n'
-            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = desc })
-          end
-          map('<leader>cr', vim.lsp.buf.rename, 'Rename variable')
-          map('<leader>ca', vim.lsp.buf.code_action, 'Code action', { 'n', 'x' })
-          map('gD', vim.lsp.buf.declaration, 'Goto declaration')
-
-          -- The following two autocommands are used to highlight references of the
-          -- word under your cursor when your cursor rests there for a little while.
-          -- See `:help CursorHold` for information about when this is executed
-          --
-          -- When you move your cursor, the highlights will be cleared (the second autocommand).
-          local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if client and client:supports_method('textDocument/documentHighlight', event.buf) then
-            local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
-            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
-              buffer = event.buf,
-              group = highlight_augroup,
-              callback = vim.lsp.buf.document_highlight,
-            })
-
-            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
-              buffer = event.buf,
-              group = highlight_augroup,
-              callback = vim.lsp.buf.clear_references,
-            })
-
-            vim.api.nvim_create_autocmd('LspDetach', {
-              group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
-              callback = function(event2)
-                vim.lsp.buf.clear_references()
-                vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
-              end,
-            })
-          end
-        end,
-      })
-
-      -- Enable the following language servers
-      -- See `:help lsp-config` for information about keys and how to configure
-      ---@type table<string, vim.lsp.Config>
-      local servers = {
+    ---@type table<string, vim.lsp.Config>
+    opts = {
+      servers = {
         clangd = {},
         gopls = {},
         pyright = {},
@@ -411,17 +386,58 @@ require('lazy').setup({
             Lua = {},
           },
         },
-      }
+      },
+    },
+
+    config = function(_, opts)
+      --  This function gets run when an LSP attaches to a particular buffer
+      vim.api.nvim_create_autocmd('LspAttach', {
+        group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
+        callback = function(event)
+          vim.keymap.set({ 'n' }, '<leader>cr', vim.lsp.buf.rename, { buffer = event.buf, desc = 'Rename variable' })
+          vim.keymap.set({ 'n', 'x' }, '<leader>ca', vim.lsp.buf.code_action, { buffer = event.buf, desc = 'Code action' })
+          vim.keymap.set({ 'n' }, 'gD', vim.lsp.buf.declaration, { buffer = event.buf, desc = 'Goto declaration' })
+
+          -- The following two autocommands are used to highlight references of the
+          -- word under your cursor when your cursor rests there for a little while.
+          -- See `:help CursorHold` for information about when this is executed
+          --
+          -- When you move your cursor, the highlights will be cleared (the second autocommand).
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if client and client:supports_method('textDocument/documentHighlight', event.buf) then
+            local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
+            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+              buffer = event.buf,
+              group = highlight_augroup,
+              callback = vim.lsp.buf.document_highlight,
+            })
+
+            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+              buffer = event.buf,
+              group = highlight_augroup,
+              callback = vim.lsp.buf.clear_references,
+            })
+
+            vim.api.nvim_create_autocmd('LspDetach', {
+              group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
+              callback = function(event2)
+                vim.lsp.buf.clear_references()
+                vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
+              end,
+            })
+          end
+        end,
+      })
 
       -- Ensure the servers and tools above are installed
       -- To check the current status of installed tools and/or manually install other tools, you can run :Mason
-      local ensure_installed = vim.tbl_keys(servers or {})
+      local ensure_installed = vim.tbl_keys(opts.servers or {})
       vim.list_extend(ensure_installed, { 'isort', 'ruff' })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
-      for name, server in pairs(servers) do
+      for name, server in pairs(opts.servers or {}) do
         vim.lsp.config(name, server)
-        vim.lsp.enable(name)
+        if name ~= '*' then vim.lsp.enable(name) end
       end
     end,
   },
@@ -887,10 +903,11 @@ require('lazy').setup({
     'mrjones2014/smart-splits.nvim',
     lazy = false,
     config = function()
-      vim.keymap.set('n', '<C-h>', require('smart-splits').move_cursor_left)
-      vim.keymap.set('n', '<C-j>', require('smart-splits').move_cursor_down)
-      vim.keymap.set('n', '<C-k>', require('smart-splits').move_cursor_up)
-      vim.keymap.set('n', '<C-l>', require('smart-splits').move_cursor_right)
+      local ss = require 'smart-splits'
+      vim.keymap.set({ 'n', 't' }, '<C-h>', ss.move_cursor_left, { desc = 'Move cursor left' })
+      vim.keymap.set({ 'n', 't' }, '<C-j>', ss.move_cursor_down, { desc = 'Move cursor down' })
+      vim.keymap.set({ 'n', 't' }, '<C-k>', ss.move_cursor_up, { desc = 'Move cursor up' })
+      vim.keymap.set({ 'n', 't' }, '<C-l>', ss.move_cursor_right, { desc = 'Move cursor right' })
     end,
   },
 
@@ -933,6 +950,7 @@ require('lazy').setup({
     keys = {
       { '<leader>a', '', desc = '+ai', mode = { 'n', 'v' } },
       { '<leader>ac', '<cmd>ClaudeCode<cr>', desc = 'Toggle Claude' },
+      { '<leader>cA', '<cmd>ClaudeCode<cr>', desc = 'Toggle Claude' },
       { '<leader>af', '<cmd>ClaudeCodeFocus<cr>', desc = 'Focus Claude' },
       { '<leader>ar', '<cmd>ClaudeCode --resume<cr>', desc = 'Resume Claude' },
       { '<leader>aC', '<cmd>ClaudeCode --continue<cr>', desc = 'Continue Claude' },

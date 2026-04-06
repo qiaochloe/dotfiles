@@ -25,8 +25,6 @@ return {
       { '<localLeader>l', '', desc = '+vimtex', ft = 'tex' },
     },
   },
-
-  -- Correctly setup lspconfig for LaTeX 🚀
   {
     'neovim/nvim-lspconfig',
     optional = true,
@@ -40,8 +38,6 @@ return {
       },
     },
   },
-
-  -- Add BibTeX/LaTeX to treesitter
   {
     'nvim-treesitter/nvim-treesitter',
     opts = function(_, opts)

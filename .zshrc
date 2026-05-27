@@ -1,103 +1,43 @@
-# POWERLEVEL10K (should stay close to the top)
+# powerlevel10k (should stay close to the top)
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# PATH
+# path
 export PATH=~/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
-# GO
-export PATH=/Users/qiaochloe/go/bin:$PATH
-
-# HOMEBREW
+# homebrew
 export PATH="/opt/homebrew/bin:$PATH"
 source $(brew --prefix)/share/powerlevel10k/powerlevel10k.zsh-theme
 
-# ALIASES
-alias config='/usr/bin/git --git-dir=/Users/qiaochloe/.cfg/ --work-tree=/Users/qiaochloe' # DOTFILES (.cfg repo)
+# aliases
 alias c='clear'
 alias lazyvim="NVIM_APPNAME=lazyvim nvim"
-alias path='echo $PATH | tr -s ":" "\n"' # PRETTY PRINT THE PATH
+alias path='echo $PATH | tr -s ":" "\n"'
 
-# VIM BINDINGS
+# vim bindings for terminal
 bindkey -v
-# Avoid the annoying backspace/delete issue where backspace stops deleting characters
+# avoid the backspace/delete issue where backspace stops deleting characters
 bindkey -v '^?' backward-delete-char
 
-# ZOXIDE
+# zoxide
 eval "$(zoxide init --hook prompt zsh)"
 
-# CONDA
-__conda_setup="$('/opt/homebrew/Caskroom/miniforge/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh" ]; then
-# . "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh"  # commented out by conda initialize
-    else
-# export PATH="/opt/homebrew/Caskroom/miniforge/base/bin:$PATH"  # commented out by conda initialize
-    fi
-fi
-unset __conda_setup
-
-# FZF
+# fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# NVM
+# nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-# ZSH-SYNTAX-HIGHLIGHTING (keep at the bottom)
-source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
-# RUBY
-export PATH="$HOME/.rbenv/shims:$PATH"
-eval "$(rbenv init - zsh)"
-
-# RUST
+# rust
 export PATH="$HOME/.cargo/bin:$PATH"
-
-# CONDA
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/opt/homebrew/Caskroom/miniforge/base/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh" ]; then
-        . "/opt/homebrew/Caskroom/miniforge/base/etc/profile.d/conda.sh"
-    else
-        export PATH="/opt/homebrew/Caskroom/miniforge/base/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
-
-# opam configuration
-[[ ! -r /Users/qiaochloe/.opam/opam-init/init.zsh ]] || source /Users/qiaochloe/.opam/opam-init/init.zsh  > /dev/null 2> /dev/null
-
-# pnpm
-export PNPM_HOME="/Users/qiaochloe/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
-
-# podman
-PATH=/opt/podman/bin:$PATH
-
-# X11
-PATH=/opt/X11/bin:$PATH
-
-# Added by CCC installer
-export PATH="$HOME/.local/bin:$PATH"
-
-# CSCI 1670 Weenix 2
-export PATH="/opt/homebrew/opt/binutils/bin:$PATH"
 
 # direnv
 eval "$(direnv hook zsh)"
+
+# zsh-syntax highlighting
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

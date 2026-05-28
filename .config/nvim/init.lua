@@ -132,6 +132,22 @@ vim.keymap.set('n', '<leader>bd', function()
   vim.cmd('bd ' .. current)
 end, { desc = 'Delete buffer' })
 
+-- Delete all hidden (not visible in any window) buffers
+vim.keymap.set('n', '<leader>bD', function()
+  local visible = {}
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    visible[vim.api.nvim_win_get_buf(win)] = true
+  end
+  local count = 0
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(buf) and not visible[buf] then
+      vim.api.nvim_buf_delete(buf, {})
+      count = count + 1
+    end
+  end
+  vim.notify('Deleted ' .. count .. ' hidden buffer(s)')
+end, { desc = 'Delete hidden buffers' })
+
 -- Clear highlights on search when pressing <Esc> in normal mode
 -- See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
@@ -357,6 +373,7 @@ require('lazy').setup({
         rust_analyzer = {},
         ts_ls = {},
         stylua = {},
+        mdx_analyzer = {},
 
         -- Special Lua Config, as recommended by neovim help docs
         lua_ls = {
@@ -465,6 +482,7 @@ require('lazy').setup({
     opts = {
       notify_on_error = true,
       format_on_save = function(bufnr)
+        if vim.g.autoformat == false then return nil end
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
@@ -939,9 +957,30 @@ require('lazy').setup({
           Snacks.toggle.inlay_hints():map '<leader>uh'
           Snacks.toggle.indent():map '<leader>ui'
           Snacks.toggle.dim():map '<leader>uD'
+          Snacks.toggle
+            .new({
+              name = 'autoformat',
+              get = function() return vim.g.autoformat ~= false end,
+              set = function(state) vim.g.autoformat = state end,
+            })
+            :map '<leader>uf'
         end,
       })
     end,
+  },
+
+  { -- Pasting
+    'HakonHarnes/img-clip.nvim',
+    event = 'VeryLazy',
+    opts = {
+      default = {
+        dir_path = '.',
+        relative_to_current_file = false,
+      },
+    },
+    keys = {
+      { '<leader>p', '<cmd>PasteImage<cr>', desc = 'Paste image from system clipboard' },
+    },
   },
 
   { -- AI

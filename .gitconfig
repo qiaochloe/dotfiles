@@ -5,6 +5,8 @@
 [alias]
     plog = log --graph --pretty=format:'%C(red)%h%Creset -%C(green)%d%Creset %s %C(yellow)(%cr) %C(blue)[%an]%Creset' --abbrev-commit 
     f = fetch
+    pu = pull
+    ps = push
     st = status
     co = commit
     com = commit -m
@@ -12,7 +14,8 @@
     chb = checkout -b
     br = branch
     d = diff
-
+    a = add
+    s = status
 
 [commit]
 	verbose = true

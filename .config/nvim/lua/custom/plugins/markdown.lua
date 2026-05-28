@@ -39,7 +39,13 @@ return {
         marksman = {
           filetypes = { 'markdown', 'markdown.mdx' },
         },
-        mdx_analyzer = {},
+        mdx_analyzer = {
+          init_options = {
+            typescript = {
+              tsdk = vim.fn.expand '~/.local/share/nvim/mason/packages/typescript-language-server/node_modules/typescript/lib',
+            },
+          },
+        },
       },
     },
   },
